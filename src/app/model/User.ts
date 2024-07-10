@@ -45,7 +45,7 @@ const messageSchema: Schema<Message> = new Schema(
   }
 );
 
-const Message = mongoose.model("Message", messageSchema);
+const Message = mongoose.model<Message>("Message", messageSchema);
 
 const userSchema: Schema<User> = new Schema(
   {
@@ -108,10 +108,11 @@ const userSchema: Schema<User> = new Schema(
       required: false,
     },
     messages: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Message",
-      },
+      messageSchema,
+      // {
+      //   type: mongoose.Schema.Types.ObjectId,
+      //   ref: "Message",
+      // },
     ],
   },
   {
@@ -119,9 +120,12 @@ const userSchema: Schema<User> = new Schema(
   }
 );
 
-const User = mongoose.model("User", userSchema);
+const UserModel =
+  (mongoose.models.User as mongoose.Model<User>) ||
+  mongoose.model<User>("User", userSchema);
 
-module.exports = {
-  User,
-  Message,
-};
+export default UserModel;
+// module.exports = {
+//   UserModel,
+//   Message,
+// };
