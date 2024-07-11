@@ -125,7 +125,3 @@ const UserModel =
   mongoose.model<User>("User", userSchema);
 
 export default UserModel;
-// module.exports = {
-//   UserModel,
-//   Message,
-// };
