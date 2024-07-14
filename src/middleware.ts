@@ -5,15 +5,18 @@ export async function middleware(request: NextRequest) {
   const token = await getToken({ req: request });
   const url = request.nextUrl;
   if (
-    (token &&
-      (url.pathname.startsWith("/sign-in") ||
-        url.pathname.startsWith("/sign-in") ||
-        url.pathname.startsWith("/verify"))) ||
-    url.pathname.startsWith("/")
+    token &&
+    (url.pathname.startsWith("/sign-in") ||
+      url.pathname.startsWith("/sign-in") ||
+      url.pathname.startsWith("/verify") ||
+      url.pathname.startsWith("/"))
   ) {
+    console.log(token, "starttttttttttttttttttttttttttttt");
+    localStorage.setItem("token", JSON.stringify(token));
     return NextResponse.redirect(new URL("/dashbaord", request.url));
   }
-  return NextResponse.redirect(new URL("/home", request.url));
+  console.log("renderedddddddddddddddddddddddddddddddddddd");
+  // return NextResponse.redirect(new URL("/home", request.url));
 }
 
 export { default } from "next-auth/middleware";
