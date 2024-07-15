@@ -12,7 +12,7 @@ export async function POST(request: Request) {
       username,
       isVerified: true,
     });
-    if (existingUser)
+    if (existingUser) {
       return Response.json(
         {
           message: "username is already taken",
@@ -22,12 +22,13 @@ export async function POST(request: Request) {
           status: 400,
         }
       );
+    }
     const existingUserByEmail = await UserModel.findOne({
       email,
     });
     const verifyCode = Math.floor(1000000 + Math.random() * 900000).toString();
     if (existingUserByEmail) {
-      if (existingUserByEmail.isVerified)
+      if (existingUserByEmail.isVerified) {
         return Response.json(
           {
             success: false,
@@ -37,7 +38,7 @@ export async function POST(request: Request) {
             status: 400,
           }
         );
-      else {
+      } else {
         const hashedPassword = await bcrypt.hash(password, 32);
         existingUserByEmail.password = hashedPassword;
         existingUserByEmail.verifyCode = verifyCode;
@@ -47,7 +48,7 @@ export async function POST(request: Request) {
         await existingUserByEmail.save();
       }
     } else {
-      const hashedPassword = await bcrypt.hash(password, 32);
+      const hashedPassword = await bcrypt.hash(password, 10);
       const expiryDate = new Date();
       expiryDate.setHours(expiryDate.getHours() + 1);
       const user = new UserModel({
@@ -55,7 +56,7 @@ export async function POST(request: Request) {
         email,
         password: hashedPassword,
         verifyCode,
-        role: "User",
+        role: "user",
         isEmailVerified: false,
         isAcceptingMessage: false,
         isVerified: false,
