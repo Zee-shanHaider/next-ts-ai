@@ -15,8 +15,9 @@ export async function middleware(request: NextRequest) {
     localStorage.setItem("token", JSON.stringify(token));
     return NextResponse.redirect(new URL("/dashbaord", request.url));
   }
-  console.log("renderedddddddddddddddddddddddddddddddddddd");
-  // return NextResponse.redirect(new URL("/home", request.url));
+  if (!token && url.pathname.startsWith("/dashboard"))
+    console.log("renderedddddddddddddddddddddddddddddddddddd");
+  return NextResponse.redirect(new URL("/sign-in", request.url));
 }
 
 export { default } from "next-auth/middleware";
