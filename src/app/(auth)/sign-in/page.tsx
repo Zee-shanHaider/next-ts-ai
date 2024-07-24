@@ -1,26 +1,43 @@
 "use client";
+import { useDebounceValue } from "usehooks-ts";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@react-email/components";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import axios, { AxiosError } from "axios";
+import { signupSchemaValidation } from "@/app/schemas/signupSchema";
+import { ApiResponse } from "@/types/ApiResponse";
 
-import { useSession, signIn, signOut } from "next-auth/react";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 export default function Component() {
-  const { data: session } = useSession();
-  if (session) {
-    return (
-      <>
-        Signed in as {session.user.email} <br />
-        <button onClick={() => signOut()}>Sign out</button>
-      </>
-    );
-  }
-  return (
-    <>
-      Not signed in <br />
-      <button
-        className="bg-blue-400 text-white p-2 px-4 rounded-md border-red-200"
-        onClick={() => signIn()}
-      >
-        Sign in
-      </button>
-    </>
-  );
+  return <h2>This is form.</h2>;
 }
+
+export const ToastDemo = () => {
+  const { toast } = useToast();
+
+  return (
+    <Button
+      onClick={() => {
+        toast({
+          title: "Scheduled: Catch up",
+          description: "Dushed",
+        });
+      }}
+    >
+      Show Toast
+    </Button>
+  );
+};

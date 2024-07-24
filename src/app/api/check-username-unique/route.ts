@@ -25,6 +25,7 @@ export async function GET(request: Request) {
             usernameErrors?.length > 0
               ? usernameErrors.join(", ")
               : "Invalid query parameters",
+          success: false,
         },
         {
           status: 403,
@@ -43,7 +44,7 @@ export async function GET(request: Request) {
           success: false,
         },
         {
-          status: 400,
+          status: 200,
         }
       );
     return Response.json(
@@ -55,15 +56,14 @@ export async function GET(request: Request) {
         status: 200,
       }
     );
-  } catch (error) {
+  } catch (error: any) {
     return Response.json(
       {
-        message: `Error registering user`,
+        message: `Error checking username uniqueness: ${error.message}`,
       },
       {
         status: 500,
       }
     );
-    console.log(error);
   }
 }
