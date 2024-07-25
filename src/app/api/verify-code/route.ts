@@ -1,7 +1,5 @@
 import dbConnect from "@/lib/dbConnection";
 import UserModel from "@/app/model/User";
-import { z } from "zod";
-import { verifySchema } from "@/app/schemas/verifySchema";
 
 export async function POST(request: Request) {
   try {
@@ -12,7 +10,7 @@ export async function POST(request: Request) {
     const user = await UserModel.findOne({
       username: decodedUsername,
     });
-    if (!user)
+    if (!user) {
       return Response.json(
         {
           message: `User not found`,
@@ -22,6 +20,8 @@ export async function POST(request: Request) {
           status: 404,
         }
       );
+    }
+
     const isCodeValid = decodedCode === user.verifyCode;
     const isCodeNotExpired = new Date(user.verifyCodeExpiration) > new Date();
     if (isCodeValid && isCodeNotExpired) {

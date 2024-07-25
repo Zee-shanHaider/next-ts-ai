@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios, { AxiosError } from "axios";
-import { signupSchemaValidation } from "@/app/schemas/signupSchema";
+import { signupSchema } from "@/app/schemas/signupSchema";
 import { ApiResponse } from "@/types/ApiResponse";
 import { Input } from "@/components/ui/input";
 
@@ -27,15 +27,15 @@ export default function Component() {
   const [debouncedValue, setValue] = useDebounceValue("", 500);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [checkUsernameStatus, setCheckUsernameStatus] =
-    useState<boolean>(undefined);
+    useState<boolean>(false);
   const [isUsernameChecking, setIsUsernameChecking] = useState(false);
   const [checkedUsernameMessage, setCheckedUsernameMessage] = useState("");
   const router = useRouter();
   const { toast } = useToast();
 
   //zod implementation
-  const form = useForm<z.infer<typeof signupSchemaValidation>>({
-    resolver: zodResolver(signupSchemaValidation),
+  const form = useForm<z.infer<typeof signupSchema>>({
+    resolver: zodResolver(signupSchema),
     defaultValues: {
       username: "",
       email: "",
@@ -43,14 +43,15 @@ export default function Component() {
     },
   });
 
+  const result = new z.ZodError([]);
+  console.log(result);
+
   useEffect(() => {
     const checkUsername = async () => {
-      console.log("Checking username");
       setIsUsernameChecking(true);
       setCheckedUsernameMessage("");
       try {
         // Replace this with your actual API call or logic to check the username
-        console.log("thissssssssssssssssssssssssssssssss");
         const response = await axios.get(
           `/api/check-username-unique?username=${debouncedValue}`
         );
@@ -60,12 +61,12 @@ export default function Component() {
           setCheckUsernameStatus(data?.success);
         }
       } catch (error) {
-        // const message
         const axiosError = error as AxiosError<ApiResponse>;
         if (error as AxiosError<ApiResponse>) {
           setCheckedUsernameMessage(
             axiosError?.response?.data.message ?? "Error checking username"
           );
+          setCheckUsernameStatus(axiosError?.response?.data.success ?? false);
         } else {
           setCheckedUsernameMessage("An unexpected error occurred");
         }
@@ -78,11 +79,10 @@ export default function Component() {
     }
   }, [debouncedValue]);
 
-  const onSubmit = async (data: z.infer<typeof signupSchemaValidation>) => {
+  const onSubmit = async (data: z.infer<typeof signupSchema>) => {
+    console.log("submission started");
     setIsSubmitting(true);
     try {
-      console.log(data, "dataaaaaaaaaaaaaaaaa");
-      // Replace this with your actual API call or logic to sign up the user
       const response = await axios.post<ApiResponse>("/api/sign-up", data);
       if (response.data.success) {
         toast({
@@ -90,14 +90,14 @@ export default function Component() {
           description: response.data.message,
         });
         setIsSubmitting(false);
-        router.replace("/verify-user");
+        router.replace(`/verify/${debouncedValue}`);
       }
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>;
       if (error as AxiosError<ApiResponse>) {
         toast({
           title: "Sign Up Error",
-          description: axiosError?.response?.data.message ?? "Error signing up",
+          description: axiosError?.response?.data.message ?? "Sign Up Failed",
           variant: "destructive",
         });
       } else {
@@ -191,7 +191,7 @@ export default function Component() {
                 )}
               />
               {isSubmitting ? (
-                <Loader2 />
+                <Loader2 className="animate-spin" />
               ) : (
                 <Button disabled={isSubmitting} variant="default" type="submit">
                   Submit
@@ -210,20 +210,3 @@ export default function Component() {
     </>
   );
 }
-
-export const ToastDemo = () => {
-  const { toast } = useToast();
-
-  return (
-    <Button
-      onClick={() => {
-        toast({
-          title: "Scheduled: Catch up",
-          description: "Dushed",
-        });
-      }}
-    >
-      Show Toast
-    </Button>
-  );
-};

@@ -25,3 +25,9 @@ export const signupSchemaValidation = z.object({
   verifyCodeExpiration: z.string(),
   messages: z.string(),
 });
+
+export const signupSchema = z.object({
+  username: usernameValidation,
+  email: z.string().email(),
+  password: passwordValidation,
+});
