@@ -43,9 +43,6 @@ export default function Component() {
     },
   });
 
-  const result = new z.ZodError([]);
-  console.log(result);
-
   useEffect(() => {
     const checkUsername = async () => {
       setIsUsernameChecking(true);
@@ -112,8 +109,8 @@ export default function Component() {
     <>
       <div className="w-full h-screen flex justify-center items-center bg-gray-50">
         <div className="w-full max-w-md p-8 bg-white shadow-lg rounded-lg">
-          <div className="flex flex-col gap-2">
-            <div className="text-4xl text-center font-semibold">
+          <div className="flex p-3 flex-col gap-2">
+            <div className="text-4xl text-center font-extrabold">
               JOIN MYSTERY MESSAGES
             </div>
             <div className="text-sm text-center font-normal">

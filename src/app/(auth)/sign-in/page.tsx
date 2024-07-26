@@ -1,15 +1,12 @@
 "use client";
-import { useDebounceValue } from "usehooks-ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import axios, { AxiosError } from "axios";
-import { signupSchema } from "@/app/schemas/signupSchema";
-import { ApiResponse } from "@/types/ApiResponse";
+import { useState } from "react";
+import { ApiResponse, catchError } from "@/types/ApiResponse";
 import { Input } from "@/components/ui/input";
 
 import {
@@ -22,101 +19,102 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Loader2 } from "lucide-react";
+import { signIn } from "next-auth/react";
+import { signInSchema } from "@/app/schemas/signInSchema";
+import { LoginFormFieldConfig } from "@/types/signInForm";
 
 export default function Component() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [checkUsernameStatus, setCheckUsernameStatus] =
-    useState<boolean>(false);
-  const [checkedUsernameMessage, setCheckedUsernameMessage] = useState("");
   const router = useRouter();
   const { toast } = useToast();
 
   //zod implementation
-  const form = useForm<z.infer<typeof signupSchema>>({
-    resolver: zodResolver(signupSchema),
+  const form = useForm<z.infer<typeof signInSchema>>({
+    resolver: zodResolver(signInSchema),
     defaultValues: {
-      email: "",
+      identifier: "",
       password: "",
     },
   });
 
-  const result = new z.ZodError([]);
-  console.log(result);
-
-  const onSubmit = async (data: z.infer<typeof signupSchema>) => {
+  const onSubmit = async (data: z.infer<typeof signInSchema>) => {
     console.log("submission started");
     setIsSubmitting(true);
     try {
-      const response = await axios.post<ApiResponse>("/api/sign-up", data);
-      if (response.data.success) {
-        toast({
-          title: "Success",
-          description: response.data.message,
-        });
-        setIsSubmitting(false);
-      }
-    } catch (error) {
-      const axiosError = error as AxiosError<ApiResponse>;
-      if (error as AxiosError<ApiResponse>) {
+      const result = await signIn("credentials", {
+        identifier: data.identifier,
+        password: data.password,
+        redirect: false,
+      });
+      if (result?.error) {
         toast({
           title: "Sign In Error",
-          description: axiosError?.response?.data.message ?? "Sign Up Failed",
+          description: result?.error ?? "Sign In Failed",
           variant: "destructive",
         });
-      } else {
-        setCheckedUsernameMessage("An unexpected error occurred");
       }
+      if (result?.url) router.replace("/dashboard");
+    } catch (error: any) {
+      toast({
+        title: "Sign In Error",
+        description: error?.message ?? "Sign Up Failed",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const formFields: LoginFormFieldConfig[] = [
+    {
+      name: "identifier",
+      label: "Email/Username",
+      type: "text",
+      placeholder: "abc@test.com",
+    },
+    {
+      name: "password",
+      label: "Password",
+      type: "password",
+      placeholder: "**********",
+    },
+  ];
+
   return (
     <>
       <div className="w-full h-screen flex justify-center items-center bg-gray-50">
         <div className="w-full max-w-md p-8 bg-white shadow-lg rounded-lg">
-          <div className="flex flex-col gap-2">
-            <div className="text-4xl text-center font-semibold">
-              Login your account
+          <div className="flex flex-col p-3 gap-4">
+            <div className="text-4xl text-center font-extrabold">
+              JOIN MYSTERY MESSAGES
+            </div>
+            <div className="text-sm text-center font-normal">
+              Signin to your anynomous adventure
             </div>
           </div>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="abc@test.com"
-                        {...field}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none- focus:ring-0"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="**********"
-                        {...field}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {formFields.map((field) => (
+                <FormField
+                  key={field.name}
+                  control={form.control}
+                  name={field.name}
+                  render={({ field: formField }) => (
+                    <FormItem>
+                      <FormLabel>{field.label}</FormLabel>
+                      <FormControl>
+                        <Input
+                          type={field.type}
+                          placeholder={field.placeholder}
+                          {...formField}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ))}
               {isSubmitting ? (
                 <Loader2 className="animate-spin" />
               ) : (
@@ -130,7 +128,7 @@ export default function Component() {
             Already a member?
             <Button variant="link" className="text-blue-400 p-2">
               Signup
-            </Button>{" "}
+            </Button>
           </div>
         </div>
       </div>

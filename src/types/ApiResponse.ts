@@ -6,3 +6,7 @@ export interface ApiResponse {
   isAcceptingMessages?: boolean;
   messages?: Array<Message>;
 }
+
+export type catchError = {
+  message?: string;
+};
