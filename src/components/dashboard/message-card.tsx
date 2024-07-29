@@ -9,17 +9,30 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Message } from "@/app/model/User";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import Alert from "./alert-card";
 
-export default function CardWithForm() {
+type MessageCard = {
+  message: Message;
+};
+export default function CardWithForm({ message }: { message: MessageCard }) {
+  const alert = {
+    title: "Confirm",
+    textContent: "You are about to create a new project.",
+  };
+  const alertConfirm = (id: string) => {
+    console.log("Confirmed alert", id);
+  };
   return (
     <Card className="w-[350px]">
       <CardHeader>
         <CardTitle>Create project</CardTitle>
-        <CardDescription>Deploy your new project in one-click.</CardDescription>
+        <CardDescription>{message.message.content}</CardDescription>
       </CardHeader>
-      <CardContent>
+      {/* <CardContent>
         <form>
           <div className="grid w-full items-center gap-4">
             <div className="flex flex-col space-y-1.5">
@@ -28,10 +41,10 @@ export default function CardWithForm() {
             </div>
           </div>
         </form>
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline">Cancel</Button>
-        <Button>Deploy</Button>
+      </CardContent> */}
+      <CardFooter className="flex justify-end">
+        {/* <Button variant="outline">Cancel</Button> */}
+        <Alert alert={alert} alertConfirm={alertConfirm} />
       </CardFooter>
     </Card>
   );

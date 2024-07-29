@@ -6,14 +6,14 @@ import clsx from "clsx";
 import React from "react";
 
 // Map of links to display in the side navigation.
-const links = [
-  { name: "Home", href: "/dashboard", icon: HomeIcon },
-  { name: "Invoices", href: "/dashboard/invoices", icon: UserIcon },
-  { name: "Customers", href: "/dashboard/customers", icon: UserIcon },
-];
 
-export default function NavLinks() {
+export default function NavLinks({ username }: { username: string }) {
   const pathname = usePathname();
+  const links = [
+    { name: "Home", href: "/dashboard", icon: HomeIcon },
+    { name: "Messages", href: `/dashboard/u/${username}`, icon: UserIcon },
+    // { name: "Customers", href: "/dashboard/customers", icon: UserIcon },
+  ];
 
   return (
     <>
