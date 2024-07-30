@@ -77,7 +77,6 @@ export default function Component() {
   }, [debouncedValue]);
 
   const onSubmit = async (data: z.infer<typeof signupSchema>) => {
-    console.log("submission started");
     setIsSubmitting(true);
     try {
       const response = await axios.post<ApiResponse>("/api/sign-up", data);

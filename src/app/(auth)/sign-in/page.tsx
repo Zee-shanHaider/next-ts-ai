@@ -38,7 +38,6 @@ export default function Component() {
   });
 
   const onSubmit = async (data: z.infer<typeof signInSchema>) => {
-    console.log("submission started");
     setIsSubmitting(true);
     try {
       const result = await signIn("credentials", {
@@ -54,7 +53,7 @@ export default function Component() {
         });
       }
       if (result?.url) router.replace("/dashboard");
-    } catch (error: any) {
+    } catch (error: catchError) {
       toast({
         title: "Sign In Error",
         description: error?.message ?? "Sign Up Failed",

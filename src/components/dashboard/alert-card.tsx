@@ -20,8 +20,8 @@ export default function Alert({
   alert,
   alertConfirm,
 }: {
-  alert: AlertDialog;
-  alertConfirm: Function;
+  alert: { title: string; textContent: string };
+  alertConfirm: () => void;
 }) {
   return (
     <AlertDialog>
@@ -35,13 +35,7 @@ export default function Alert({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={() => {
-              alertConfirm("iddddddddddddddddddddddddddddddddddddddddeeee");
-            }}
-          >
-            Continue
-          </AlertDialogAction>
+          <AlertDialogAction onClick={alertConfirm}>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

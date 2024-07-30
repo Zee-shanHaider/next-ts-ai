@@ -11,12 +11,10 @@ export async function GET(request: Request) {
   try {
     await dbConnect();
     const { searchParams } = new URL(request.url);
-    console.log(searchParams, "searchhh params");
     const queryParam = {
       username: searchParams.get("username"),
     };
     const result = UsernameQuerySchema.safeParse(queryParam);
-    console.log(result, "resssssssssultttttt");
     if (!result.success) {
       const usernameErrors = result.error.format().username?._errors || [];
       return Response.json(

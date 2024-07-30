@@ -2,8 +2,9 @@ import dbConnect from "@/lib/dbConnection";
 import UserModel from "@/app/model/User";
 import { authOptions } from "../auth/[...nextauth]/options";
 import { User, getServerSession } from "next-auth";
+import mongoose from "mongoose";
 
-export async function POST(request: Request) {
+export async function PUT(request: Request) {
   await dbConnect();
   const session = await getServerSession(authOptions);
   const user: User = session?.user as User;
@@ -15,13 +16,13 @@ export async function POST(request: Request) {
       },
       { status: 401 }
     );
-  const userId = user?._id;
-  const { acceptMessages } = await request.json();
+  const userId = new mongoose.Types.ObjectId(user._id);
+  const { isAcceptingMessage } = await request.json();
   try {
     const updatedUser = await UserModel.findByIdAndUpdate(
       userId,
       {
-        isAcceptingMessage: acceptMessages,
+        isAcceptingMessage,
       },
       { new: true } // it returns the updated value of user
     );

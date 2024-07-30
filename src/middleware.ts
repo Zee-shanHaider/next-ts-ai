@@ -11,12 +11,10 @@ export async function middleware(request: NextRequest) {
       url.pathname.startsWith("/verify") ||
       url.pathname.startsWith("/"))
   ) {
-    console.log(token, "starttttttttttttttttttttttttttttt");
     localStorage.setItem("token", JSON.stringify(token));
     return NextResponse.redirect(new URL("/dashbaord", request.url));
   }
   if (!token && url.pathname.startsWith("/dashboard")) {
-    console.log("renderedddddddddddddddddddddddddddddddddddd");
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 }
